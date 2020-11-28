@@ -6,6 +6,8 @@ import (
 	"github.com/BryanKMorrow/aqua-events-go/src/slack"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 )
 
 // Index - Home route
@@ -22,5 +24,21 @@ func SlackHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Failed to decode audit event from Aqua")
 	}
 	w.Header().Set("Content-Type", "application/json")
+	webhook, ignore := getEnv()
+	m.Webhook = webhook
+	m.IgnoreList = ignore
 	m.ProcessAudit(audit)
+}
+
+// getEnv is an ugly call to get the environment variables that need to be passed
+func getEnv() (string,[]string) {
+	webhook := os.Getenv("SLACK_WEBHOOK")
+	ignore := os.Getenv("IGNORE_LIST")
+	var splits []string
+	if ignore != "" {
+		// convert CSV list to slice
+		splits = strings.Split(ignore, ",")
+		log.Println(splits)
+	}
+	return webhook, splits
 }

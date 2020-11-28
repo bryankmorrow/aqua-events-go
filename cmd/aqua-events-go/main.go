@@ -25,5 +25,9 @@ func checkEnv() bool {
 		log.Println("Please set the SLACK_WEBHOOK environment variable")
 		fatal = true
 	}
+	ignore := os.Getenv("IGNORE_LIST")
+	if ignore == "" {
+		log.Println("Nothing in IGNORE_LIST, everything will be sent to Slack")
+	}
 	return fatal
 }
