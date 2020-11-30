@@ -40,11 +40,12 @@ type Audit struct {
 	ResourceDigest    string   `json:"resource_digest,omitempty"`
 	ResourceName      string   `json:"resource_name,omitempty"`
 	ResourceType      string   `json:"resoure_type,omitempty"`
-	Result            int      `json:"result,omitempty"` // 2 = block, 4 = policy.failure, 1 = success?, 3 = detect?
+	Result            int      `json:"result,omitempty"` // 2 = block, 4 = alert, 1 = success, 3 = detect?
 	Rule              string   `json:"rule,omitempty"`
 	RuleType          string   `json:"rule_type,omitempty"`
 	Secret            string   `json:"secret,omitempty"`
 	SourceAddress     string   `json:"source_address,omitempty"`
+	StartTime         int      `json:"start_time,omitempty"`
 	Subtype           string   `json:"subtype,omitempty"`
 	Time              int      `json:"time,omitempty"`
 	Type              string   `json:"type,omitempty"` // alert, administration
