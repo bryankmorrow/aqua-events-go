@@ -27,7 +27,7 @@ type Audit struct {
 	Imageid           string   `json:"imageid,omitempty"`
 	K8SCluster        string   `json:"k8s_cluster,omitempty"`
 	Level             string   `json:"level,omitempty"` // success, block, detect, alert
-	Low               string   `json:"low,omitempty"`
+	Low               int      `json:"low,omitempty"`
 	Medium            int      `json:"medium,omitempty"`
 	Pid               int      `json:"pid,omitempty"`
 	Poddeployment     string   `json:"poddeployment,omitempty"`
