@@ -119,6 +119,7 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 		}
 		text = string(data)
 	} else if audit.Result == 4 {
+		log.Printf("Data: %s", audit.Data)
 		var control string
 		m.Attachment.Color = "danger"
 		if audit.Category == "image" {

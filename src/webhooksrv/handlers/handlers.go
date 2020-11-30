@@ -22,7 +22,6 @@ func SlackHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&audit)
 	if err != nil {
 		log.Println("Failed to decode audit event from Aqua ", err)
-		log.Println(r.Body)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	webhook, ignore := getEnv()

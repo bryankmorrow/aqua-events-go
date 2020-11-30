@@ -11,7 +11,7 @@ type Audit struct {
 	Control           string   `json:"control,omitempty"`
 	CreateTime        int      `json:"create_time,omitempty"`
 	Critical          int      `json:"critical,omitempty"`
-	Data              Data     `json:"data,omitempty"`
+	Data              string   `json:"data,omitempty"`
 	Date              int      `json:"date,omitempty"`
 	Description       string   `json:"description,omitempty"`
 	Euid              string   `json:"euid,omitempty"`
