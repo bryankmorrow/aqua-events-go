@@ -11,21 +11,23 @@ import (
 
 const (
 	// AuthorName is the message identifier
-	AuthorName    = "aqua-events"
+	AuthorName = "aqua-events"
 	// Fallback is the backup for AuthorName
-	Fallback      = "Aqua Security Audit Events"
+	Fallback = "Aqua Security Audit Events"
 	// AuthorSubname follows the AuthorName in the header
 	AuthorSubname = "AquaEvents"
 	// AuthorLink points to the github repo for this application
-	AuthorLink    = "https://github.com/BryanKMorrow/aqua-events-go"
+	AuthorLink = "https://github.com/BryanKMorrow/aqua-events-go"
 )
 
+// Message is the slack struct
 type Message struct {
 	Attachment slack.Attachment `json:"attachment"`
 	Webhook    string           `json:"webhook"`
 	IgnoreList []string         `json:"ignore_list"`
 }
 
+// ProcessAudit receives the post data and sends to slack
 func (m *Message) ProcessAudit(audit aqua.Audit) {
 	text, err := json.Marshal(&audit)
 	if err != nil {
