@@ -81,6 +81,7 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 	m.Attachment.AuthorIcon = AuthorIcon
 	// format based on message level
 	if audit.Result == 1 {
+		log.Println("Data if found: ", audit.Data)
 		m.Attachment.Color = "good"
 		if audit.Type == "Administration" {
 			text = fmt.Sprintf("Type: %s\nAction: %s\nPerformed On: %s\nPerformed By: %s\nAqua Response: %s\nTimestamp: %s\n",
@@ -124,11 +125,16 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 		if err != nil {
 			log.Println("error while unmarshalling alert data field ", err)
 		}
-		log.Println(data)
 		var control string
 		m.Attachment.Color = "danger"
 		if audit.Category == "image" {
-			control = "non-compliant"
+			if data.Blocking && data.Pending {
+				control = "non-compliant container(s) already running"
+			} else if data.Blocking && !data.Pending {
+				control = "non-compliant"
+			} else {
+				control = "non-compliant"
+			}
 			text = fmt.Sprintf("Image %s is %s", audit.Image, control)
 		} else {
 			a, err = json.Marshal(&audit)
