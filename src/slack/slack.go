@@ -10,16 +10,20 @@ import (
 )
 
 const (
+	// AuthorName is the message identifier
 	AuthorName    = "aqua-events"
+	// Fallback is the backup for AuthorName
 	Fallback      = "Aqua Security Audit Events"
+	// AuthorSubname follows the AuthorName in the header
 	AuthorSubname = "AquaEvents"
+	// AuthorLink points to the github repo for this application
 	AuthorLink    = "https://github.com/BryanKMorrow/aqua-events-go"
 )
 
 type Message struct {
-	Attachment  slack.Attachment     `json:"attachment"`
-	Webhook     string               `json:"webhook"`
-	IgnoreList  []string             `json:"ignore_list"`
+	Attachment slack.Attachment `json:"attachment"`
+	Webhook    string           `json:"webhook"`
+	IgnoreList []string         `json:"ignore_list"`
 }
 
 func (m *Message) ProcessAudit(audit aqua.Audit) {
@@ -28,9 +32,10 @@ func (m *Message) ProcessAudit(audit aqua.Audit) {
 		log.Println(err)
 		return
 	}
-	log.Println(m.IgnoreList)
 	contains := sliceContains(m.IgnoreList, "success")
-	if contains { log.Println("ignoring success events")}
+	if contains {
+		log.Println("ignoring success events")
+	} // DEBUG
 	if audit.Level == "block" {
 		m.Attachment.Color = "bad"
 	} else if audit.Level == "success" {
@@ -66,4 +71,3 @@ func sliceContains(s []string, str string) bool {
 
 	return false
 }
-

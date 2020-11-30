@@ -1,5 +1,6 @@
 package aqua
 
+// Audit a generic struct to store all messages from Aqua
 type Audit struct {
 	Action            string   `json:"action,omitempty"` // exec, login, policy.failure, create, accept, start, Scan,
 	Adjective         string   `json:"adjective,omitempty"`

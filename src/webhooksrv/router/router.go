@@ -7,7 +7,6 @@ import (
 	"log"
 )
 
-
 // Router represents the gorilla mux router
 type Router struct {
 	Router *mux.Router
@@ -51,4 +50,3 @@ func NewRouter() (r Router) {
 	r.Router = mux.NewRouter().StrictSlash(true).UseEncodedPath()
 	return
 }
-

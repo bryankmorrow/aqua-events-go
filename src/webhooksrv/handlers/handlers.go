@@ -10,12 +10,12 @@ import (
 	"strings"
 )
 
-// Index - Home route
+// IndexHandler - Home route
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Welcome to aqua-events-go"))
 }
 
-
+// SlackHandler handles all slack messages
 func SlackHandler(w http.ResponseWriter, r *http.Request) {
 	var audit aqua.Audit
 	var m slack.Message
@@ -31,7 +31,7 @@ func SlackHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // getEnv is an ugly call to get the environment variables that need to be passed
-func getEnv() (string,[]string) {
+func getEnv() (string, []string) {
 	webhook := os.Getenv("SLACK_WEBHOOK")
 	ignore := os.Getenv("IGNORE_LIST")
 	var splits []string

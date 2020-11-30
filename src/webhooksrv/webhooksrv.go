@@ -10,8 +10,10 @@ import (
 )
 
 const (
+	// URL is the local address and port to listen
 	URL = "0.0.0.0:8000"
 )
+
 // Server represents the webhooksrv
 type Server struct {
 	URL string
@@ -46,4 +48,3 @@ func (s *Server) Start() {
 	}
 	log.Fatal(newServer.ListenAndServe())
 }
-
