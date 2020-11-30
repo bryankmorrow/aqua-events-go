@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/BryanKMorrow/aqua-events-go/src/aqua"
+	"github.com/mitchellh/mapstructure"
 	"github.com/slack-go/slack"
 	"log"
 	"strconv"
@@ -72,7 +73,7 @@ func (m *Message) ProcessAudit(audit aqua.Audit) {
 func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 	var text string
 	var err error
-	var data []byte
+	var a []byte
 	// base attachment settings
 	m.Attachment.Fallback = Fallback
 	m.Attachment.AuthorName = AuthorName
@@ -98,27 +99,30 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 				audit.Hostgroup, time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
 			m.Attachment.AuthorSubname = fmt.Sprintf("User ran action %s on host %s", audit.Action, audit.Host)
 		} else {
-			data, err = json.Marshal(&audit)
+			a, err = json.Marshal(&audit)
 			if err != nil {
 				log.Println(err)
 			}
-			text = string(data)
+			text = string(a)
 		}
 	} else if audit.Result == 3 {
 		m.Attachment.Color = "warning"
-		data, err = json.Marshal(&audit)
+		a, err = json.Marshal(&audit)
 		if err != nil {
 			log.Println(err)
 		}
-		text = string(data)
+		text = string(a)
 	} else if audit.Result == 2 {
 		m.Attachment.Color = "danger"
-		data, err = json.Marshal(&audit)
+		a, err = json.Marshal(&audit)
 		if err != nil {
 			log.Println(err)
 		}
-		text = string(data)
+		text = string(a)
 	} else if audit.Result == 4 {
+		data := aqua.Data{}
+		mapstructure.Decode(audit.Data, &data)
+		log.Printf("Decode Data: %v\n", data)
 		log.Printf("Data: %s", audit.Data)
 		var control string
 		m.Attachment.Color = "danger"
@@ -126,11 +130,11 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 			control = "non-compliant"
 			text = fmt.Sprintf("Image %s is %s", audit.Image, control)
 		} else {
-			data, err = json.Marshal(&audit)
+			a, err = json.Marshal(&audit)
 			if err != nil {
 				log.Println(err)
 			}
-			text = string(data)
+			text = string(a)
 		}
 	}
 	m.Attachment.Text = text
