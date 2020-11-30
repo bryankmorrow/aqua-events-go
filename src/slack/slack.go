@@ -72,6 +72,8 @@ func (m *Message) ProcessAudit(audit aqua.Audit) {
 
 func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 	var text string
+	var err error
+	var data []byte
 	// base attachment settings
 	m.Attachment.Fallback = Fallback
 	m.Attachment.AuthorName = AuthorName
@@ -92,13 +94,34 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 			text = fmt.Sprintf("Host: %s\nHost IP: %s\nImage Name: %s\nContainer Name: %s\nAction: %s\nKubernetes Cluster: %s\nVM Location: %s\nAqua Response: %s\nAqua Policy: %s\nDetails: %s\n" +
 				"Enforcer Group: %s\nTime Stamp: %s\n", audit.Host, audit.Hostip, audit.Image, audit.Container, audit.Action, audit.K8SCluster, audit.VMLocation, "Success", audit.Rule, audit.Result,
 				audit.Hostgroup, time.Unix(int64(audit.Time),0).Format(time.RFC822Z))
+		} else {
+			data, err = json.Marshal(&audit)
+			if err != nil {
+				log.Println(err)
+			}
+			text = string(data)
 		}
 	} else if audit.Result == 3 {
 		m.Attachment.Color = "warning"
+		data, err = json.Marshal(&audit)
+		if err != nil {
+			log.Println(err)
+		}
+		text = string(data)
 	} else if audit.Result == 2  {
 		m.Attachment.Color = "danger"
+		data, err = json.Marshal(&audit)
+		if err != nil {
+			log.Println(err)
+		}
+		text = string(data)
 	} else if audit.Result == 4 {
 		m.Attachment.Color = "danger"
+		data, err = json.Marshal(&audit)
+		if err != nil {
+			log.Println(err)
+		}
+		text = string(data)
 	}
 
 	m.Attachment.Text = text
