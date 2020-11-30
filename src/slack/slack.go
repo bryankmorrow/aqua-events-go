@@ -119,15 +119,12 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 		}
 		text = string(a)
 	} else if audit.Result == 4 {
-		d, ok := audit.Data.(aqua.Data)
-		if ok {
-			log.Println("Data was mapped successfully from interface")
-			log.Printf("D: %v", d)
-		} else {
-			log.Println("Data was not mapped successfully from interface")
-			log.Printf("Data: %T", audit.Data)
+		var data aqua.Data
+		err = json.Unmarshal([]byte(audit.Data), &data)
+		if err != nil {
+			log.Println("error while unmarshalling alert data field ", err)
 		}
-		log.Printf("Data: %s", audit.Data)
+		log.Println(data)
 		var control string
 		m.Attachment.Color = "danger"
 		if audit.Category == "image" {
