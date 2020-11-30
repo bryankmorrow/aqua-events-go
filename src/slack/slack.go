@@ -88,7 +88,15 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 				audit.Type, audit.Action, fmt.Sprintf("%s %s", audit.Category, audit.Adjective), audit.User, "Success", time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
 			m.Attachment.AuthorSubname = fmt.Sprintf("User %s performed %s on %s", audit.User, audit.Action, fmt.Sprintf("%s %s", audit.Category, audit.Adjective))
 		} else if audit.Type == "CVE" || audit.Category == "CVE" {
-			log.Println("Start Time: ", audit.StartTime)
+			if audit.StartTime == 0 {
+				text = fmt.Sprintf("Image: %s\nImage Hash: %s\nRegistry: %s\nImage added by user: %s\nImage scan start time: %s\nImage scan end time: %s\nAqua Response: %s\nTimestamp: %s\n",
+					audit.Image, audit.Imagehash, audit.Registry, audit.User, time.Unix(int64(audit.Time), 0).Format(time.RFC822Z), time.Unix(int64(audit.Time), 0).Format(time.RFC822Z),
+					"Success", time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
+			} else {
+				text = fmt.Sprintf("Image: %s\nImage Hash: %s\nRegistry: %s\nImage added by user: %s\nImage scan start time: %s\nImage scan end time: %s\nAqua Response: %s\nTimestamp: %s\n",
+					audit.Image, audit.Imagehash, audit.Registry, audit.User, time.Unix(int64(audit.StartTime), 0).Format(time.RFC822Z), time.Unix(int64(audit.Time), 0).Format(time.RFC822Z),
+					"Success", time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
+			}
 			text = fmt.Sprintf("Image: %s\nImage Hash: %s\nRegistry: %s\nImage added by user: %s\nImage scan start time: %s\nImage scan end time: %s\nAqua Response: %s\nTimestamp: %s\n",
 				audit.Image, audit.Imagehash, audit.Registry, audit.User, time.Unix(int64(audit.StartTime), 0).Format(time.RFC822Z), time.Unix(int64(audit.Time), 0).Format(time.RFC822Z),
 				"Success", time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
@@ -126,7 +134,7 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 		if audit.Category == "image" {
 			if audit.Data.Blocking && audit.Data.Pending {
 				control = "non-compliant container(s) already running"
-			} else if audit.Data.Blocking && !audit.Data.Pending {
+			} else {
 				control = "non-compliant"
 			}
 			text = fmt.Sprintf("Image %s is %s due to policy %s", audit.Image, control, audit.Data.PolicyName)
@@ -138,7 +146,6 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 			text = string(data)
 		}
 	}
-
 	m.Attachment.Text = text
 	m.Attachment.Ts = json.Number(strconv.FormatInt(time.Now().Unix(), 10))
 	msg := slack.WebhookMessage{
@@ -154,6 +161,5 @@ func sliceContains(s []string, str string) bool {
 			return true
 		}
 	}
-
 	return false
 }
