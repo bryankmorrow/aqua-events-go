@@ -86,11 +86,11 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 		if audit.Type == "Administrator" {
 			text = fmt.Sprintf("Type: %s\nAction: %s\nPerformed On: %s\nPerformed By: %s\nAqua Response: %s\nTimestamp: %s\n",
 				audit.Type, audit.Action, fmt.Sprintf("%s %s", audit.Category, audit.Adjective), audit.User, "Success", time.Unix(int64(audit.Time),0).Format(time.RFC822Z))
-		} else if audit.Type == "CVE" {
-			text = fmt.Sprintf("Image: %s\nImage Hash: %s\nRegistry: %s\nImage added by user: %s\nImage scan start time: %s\nImage scan end time: %sAqua Response: %s\nTimestamp: %s\n",
+		} else if audit.Type == "CVE" || audit.Category == "CVE"{
+			text = fmt.Sprintf("Image: %s\nImage Hash: %s\nRegistry: %s\nImage added by user: %s\nImage scan start time: %s\nImage scan end time: %s\nAqua Response: %s\nTimestamp: %s\n",
 				audit.Image, audit.Imagehash, audit.Registry, audit.User, time.Unix(int64(audit.StartTime),0).Format(time.RFC822Z), time.Unix(int64(audit.Time),0).Format(time.RFC822Z),
 				"Success", time.Unix(int64(audit.Time),0).Format(time.RFC822Z))
-		} else if audit.Type == "Docker" {
+		} else if audit.Type == "Docker" || audit.Category == "container" || audit.Category == "image" {
 			text = fmt.Sprintf("Host: %s\nHost IP: %s\nImage Name: %s\nContainer Name: %s\nAction: %s\nKubernetes Cluster: %s\nVM Location: %s\nAqua Response: %s\nAqua Policy: %s\nDetails: %s\n" +
 				"Enforcer Group: %s\nTime Stamp: %s\n", audit.Host, audit.Hostip, audit.Image, audit.Container, audit.Action, audit.K8SCluster, audit.VMLocation, "Success", audit.Rule, audit.Result,
 				audit.Hostgroup, time.Unix(int64(audit.Time),0).Format(time.RFC822Z))
