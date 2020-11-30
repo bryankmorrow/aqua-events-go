@@ -132,12 +132,9 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 		var control string
 		m.Attachment.Color = "danger"
 		if audit.Category == "image" {
-			if audit.Data.Blocking && audit.Data.Pending {
-				control = "non-compliant container(s) already running"
-			} else {
-				control = "non-compliant"
-			}
-			text = fmt.Sprintf("Image %s is %s due to policy %s", audit.Image, control, audit.Data.PolicyName)
+			log.Println("Data: %s", audit.Data)
+			control = "non-compliant"
+			text = fmt.Sprintf("Image %s is %s", audit.Image, control)
 		} else {
 			data, err = json.Marshal(&audit)
 			if err != nil {
