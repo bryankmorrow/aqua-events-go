@@ -98,7 +98,7 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 			text = fmt.Sprintf("Host: %s\nHost IP: %s\nImage Name: %s\nContainer Name: %s\nAction: %s\nKubernetes Cluster: %s\nVM Location: %s\nAqua Response: %s\nAqua Policy: %s\nDetails: %s\n"+
 				"Enforcer Group: %s\nTime Stamp: %s\n", audit.Host, audit.Hostip, audit.Image, audit.Container, audit.Action, audit.K8SCluster, audit.VMLocation, "Success", audit.Rule, audit.Reason,
 				audit.Hostgroup, time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
-			m.Attachment.AuthorSubname = fmt.Sprintf("User ran container %s on host %s", audit.Action, audit.Host)
+			m.Attachment.AuthorSubname = fmt.Sprintf("User ran action %s on host %s", audit.Action, audit.Host)
 		} else {
 			data, err = json.Marshal(&audit)
 			if err != nil {
@@ -121,12 +121,22 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 		}
 		text = string(data)
 	} else if audit.Result == 4 {
+		var control string
 		m.Attachment.Color = "danger"
-		data, err = json.Marshal(&audit)
-		if err != nil {
-			log.Println(err)
+		if audit.Category == "image" {
+			if audit.Data.Blocking && audit.Data.Pending {
+				control = "non-compliant container(s) already running"
+			} else if audit.Data.Blocking && !audit.Data.Pending {
+				control = "non-compliant"
+			}
+			text = fmt.Sprintf("Image %s is %s due to policy %s", audit.Image, control, audit.Data.PolicyName)
+		} else {
+			data, err = json.Marshal(&audit)
+			if err != nil {
+				log.Println(err)
+			}
+			text = string(data)
 		}
-		text = string(data)
 	}
 
 	m.Attachment.Text = text

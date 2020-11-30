@@ -11,7 +11,7 @@ type Audit struct {
 	Control           string   `json:"control,omitempty"`
 	CreateTime        int      `json:"create_time,omitempty"`
 	Critical          int      `json:"critical,omitempty"`
-	Data              string   `json:"data,omitempty"`
+	Data              Data     `json:"data,omitempty"`
 	Date              int      `json:"date,omitempty"`
 	Description       string   `json:"description,omitempty"`
 	Euid              string   `json:"euid,omitempty"`
@@ -56,4 +56,15 @@ type Audit struct {
 	VMID              string   `json:"vm_id,omitempty"`
 	VMLocation        string   `json:"vm_location,omitempty"`
 	VMName            string   `json:"vm_name,omitempty"`
+}
+
+// Data is an alert substructure of Audits
+type Data struct {
+	Blocking   bool     `json:"blocking,omitempty"`
+	Controls   []string `json:"controls,omitempty"`
+	Pending    bool     `json:"pending,omitempty"`
+	PolicyID   int      `json:"policy_id,omitempty"`
+	PolicyName string   `json:"policy_name,omitempty"`
+	Registry   string   `json:"registry,omitempty"`
+	Repository string   `json:"repository,omitempty"`
 }

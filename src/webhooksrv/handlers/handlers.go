@@ -22,7 +22,7 @@ func SlackHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&audit)
 	if err != nil {
 		log.Println("Failed to decode audit event from Aqua")
-		log.Println(r.Body)
+		log.Println(r)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	webhook, ignore := getEnv()
@@ -39,7 +39,6 @@ func getEnv() (string, []string) {
 	if ignore != "" {
 		// convert CSV list to slice
 		splits = strings.Split(ignore, ",")
-		log.Println(splits)
 	}
 	return webhook, splits
 }
