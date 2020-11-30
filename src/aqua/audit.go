@@ -46,7 +46,6 @@ type Audit struct {
 	RuleType          string      `json:"rule_type,omitempty"`
 	Secret            string      `json:"secret,omitempty"`
 	SourceAddress     string      `json:"source_address,omitempty"`
-	StartTime         int         `json:"start_time,omitempty"`
 	Subtype           string      `json:"subtype,omitempty"`
 	Time              int         `json:"time,omitempty"`
 	Type              string      `json:"type,omitempty"` // alert, administration
