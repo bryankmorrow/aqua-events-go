@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/BryanKMorrow/aqua-events-go/src/aqua"
-	"github.com/mitchellh/mapstructure"
 	"github.com/slack-go/slack"
 	"log"
 	"strconv"
@@ -120,9 +119,14 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 		}
 		text = string(a)
 	} else if audit.Result == 4 {
-		data := aqua.Data{}
-		mapstructure.Decode(audit.Data, &data)
-		log.Printf("Decode Data: %v\n", data)
+		d, ok := audit.Data.(aqua.Data)
+		if ok {
+			log.Println("Data was mapped successfully from interface")
+			log.Printf("D: %v", d)
+		} else {
+			log.Println("Data was not mapped successfully from interface")
+			log.Printf("Data: %T", audit.Data)
+		}
 		log.Printf("Data: %s", audit.Data)
 		var control string
 		m.Attachment.Color = "danger"
