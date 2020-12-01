@@ -14,6 +14,7 @@ type Audit struct {
 	Data              string   `json:"data,omitempty"`
 	Date              int      `json:"date,omitempty"`
 	Description       string   `json:"description,omitempty"`
+	DtaSkipped        bool     `json:"dta_skipped,omitempty"`
 	Euid              string   `json:"euid,omitempty"`
 	Euser             string   `json:"euser,omitempty"`
 	High              int      `json:"high,omitempty"`
@@ -59,11 +60,31 @@ type Audit struct {
 
 // Data is an alert substructure of Audits
 type Data struct {
-	Blocking   bool     `json:"blocking,omitempty"`
-	Controls   []string `json:"controls,omitempty"`
-	Pending    bool     `json:"pending,omitempty"`
-	PolicyID   int      `json:"policy_id,omitempty"`
-	PolicyName string   `json:"policy_name,omitempty"`
-	Registry   string   `json:"registry,omitempty"`
-	Repository string   `json:"repository,omitempty"`
+	AdhocScanRegistry string   `json:"adhoc_scan_registry,omitempty"`
+	Adjective         string   `json:"adjective,omitempty"`
+	Blocking          bool     `json:"blocking,omitempty"`
+	BuildNumber       string   `json:"build_number,omitempty"`
+	BuildPipeline     string   `json:"build_pipeline,omitempty"`
+	Controls          []string `json:"controls,omitempty"`
+	Critical          int      `json:"critical,omitempty"`
+	Description       string   `json:"description,omitempty"`
+	DtaSeverityScore  string   `json:"dta_severity_score,omitempty"`
+	DtaSkipped        bool     `json:"dta_skipped,omitempty"`
+	High              int      `json:"high,omitempty"`
+	Host              string   `json:"host,omitempty"`
+	Low               int      `json:"low,omitempty"`
+	Malware           int      `json:"malware,omitempty"`
+	Medium            int      `json:"medium,omitempty"`
+	Pending           bool     `json:"pending,omitempty"`
+	PolicyID          int      `json:"policy_id,omitempty"`
+	PolicyName        string   `json:"policy_name,omitempty"`
+	Registry          string   `json:"registry,omitempty"`
+	Repository        string   `json:"repository,omitempty"`
+	ScanDuration      int      `json:"scan_duration,omitempty"`
+	ScanEndTime       int      `json:"scan_end_time,omitempty"`
+	ScanStartTime     int      `json:"scan_start_time,omitempty"`
+	SensitiveData     int      `json:"sensitive_data,omitempty"`
+	SourceIP          string   `json:"source_ip,omitempty"`
+	Time              int      `json:"time,omitempty"`
+	Type              string   `json:"type,omitempty"`
 }

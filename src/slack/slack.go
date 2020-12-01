@@ -7,6 +7,7 @@ import (
 	"github.com/slack-go/slack"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -81,18 +82,17 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 	m.Attachment.AuthorIcon = AuthorIcon
 	// format based on message level
 	if audit.Result == 1 {
-		log.Println("Data if found: ", audit.Data)
 		m.Attachment.Color = "good"
 		if audit.Type == "Administration" {
 			text = fmt.Sprintf("Type: %s\nAction: %s\nPerformed On: %s\nPerformed By: %s\nAqua Response: %s\nTimestamp: %s\n",
 				audit.Type, audit.Action, fmt.Sprintf("%s %s", audit.Category, audit.Adjective), audit.User, "Success", time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
 			m.Attachment.AuthorSubname = fmt.Sprintf("User %s performed %s on %s", audit.User, audit.Action, fmt.Sprintf("%s %s", audit.Category, audit.Adjective))
 		} else if audit.Type == "CVE" || audit.Category == "CVE" {
+			log.Println("Data: ", audit.Data)
 			text = fmt.Sprintf("Image: %s\nImage Hash: %s\nRegistry: %s\nImage added by user: %s\nImage scan start time: %s\nImage scan end time: %s\nAqua Response: %s\nTimestamp: %s\n",
 				audit.Image, audit.Imagehash, audit.Registry, audit.User, time.Unix(int64(audit.Time), 0).Format(time.RFC822Z), time.Unix(int64(audit.Time), 0).Format(time.RFC822Z),
 				"Success", time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
-			m.Attachment.AuthorSubname = fmt.Sprintf("Scan of image %s from registry %s revealed critical:%d high:%d medium:%d low:%d", audit.Image, audit.Registry, audit.Critical, audit.High,
-				audit.Medium, audit.Low)
+			m.Attachment.AuthorSubname = fmt.Sprintf("Scan of image %s from registry %s revealed no security issues", audit.Image, audit.Registry)
 		} else if audit.Type == "Docker" || audit.Category == "container" || audit.Category == "image" {
 			text = fmt.Sprintf("Host: %s\nHost IP: %s\nImage Name: %s\nContainer Name: %s\nAction: %s\nKubernetes Cluster: %s\nVM Location: %s\nAqua Response: %s\nAqua Policy: %s\nDetails: %s\n"+
 				"Enforcer Group: %s\nTime Stamp: %s\n", audit.Host, audit.Hostip, audit.Image, audit.Container, audit.Action, audit.K8SCluster, audit.VMLocation, "Success", audit.Rule, audit.Reason,
@@ -107,11 +107,19 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 		}
 	} else if audit.Result == 3 {
 		m.Attachment.Color = "warning"
-		a, err = json.Marshal(&audit)
-		if err != nil {
-			log.Println(err)
+		if audit.Category == "CVE" {
+			text = fmt.Sprintf("Image: %s\nRegistry: %s\nImage was addded by user %s\nImage scan start time: %s\nImage scan end time: %s\n"+
+				"Aqua Response: %s\nTime Stamp: %s\n", audit.Image, audit.Registry, audit.User,
+				time.Unix(int64(audit.Time), 0).Format(time.RFC822Z), time.Unix(int64(audit.Time), 0).Format(time.RFC822Z), "Detect", time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
+			m.Attachment.AuthorSubname = fmt.Sprintf("Scan of image %s from registry %s revealed %d total vulnerabilities",
+				audit.Image, audit.Registry, audit.Critical+audit.High+audit.Medium+audit.Low)
+		} else {
+			a, err = json.Marshal(&audit)
+			if err != nil {
+				log.Println(err)
+			}
+			text = string(a)
 		}
-		text = string(a)
 	} else if audit.Result == 2 {
 		m.Attachment.Color = "danger"
 		a, err = json.Marshal(&audit)
@@ -130,12 +138,29 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 		if audit.Category == "image" {
 			if data.Blocking && data.Pending {
 				control = "non-compliant container(s) already running"
-			} else if data.Blocking && !data.Pending {
-				control = "non-compliant"
 			} else {
 				control = "non-compliant"
 			}
-			text = fmt.Sprintf("Image %s is %s", audit.Image, control)
+			var data aqua.Data
+			err = json.Unmarshal([]byte(audit.Data), &data)
+			if err != nil {
+				log.Println("error while unmarshalling alert data field ", err)
+				splitBadData(audit.Data)
+
+			}
+			var controls string
+			for i, str := range data.Controls {
+				if i == 0 {
+					controls = str
+				} else if i == len(data.Controls)-1 {
+					controls = controls + str
+				} else {
+					controls = controls + ", " + str + ", "
+				}
+			}
+			text = fmt.Sprintf("Entity: %s\nImage: %s\nAction taken: %s\nPolicy: %s\nFailed Controls: %s\nRegistry: %s\n Aqua Response: %s\nTime Stamp: %s",
+				"Image", audit.Image, audit.Action, data.PolicyName, controls, data.Registry, "Alert", time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
+			m.Attachment.AuthorSubname = fmt.Sprintf("Image %s is %s", audit.Image, control)
 		} else {
 			a, err = json.Marshal(&audit)
 			if err != nil {
@@ -160,4 +185,16 @@ func sliceContains(s []string, str string) bool {
 		}
 	}
 	return false
+}
+
+func splitBadData(d string) {
+	splits := strings.Split(d, ",")
+	log.Println("SPLITS: ", splits)
+	for _, str := range splits {
+		cSplit := strings.Split(str, ":")
+		log.Println("CSPLIT: ", cSplit)
+		for _, c := range cSplit {
+			log.Println("Split key and value: ", c)
+		}
+	}
 }
