@@ -7,10 +7,10 @@
 
 - [Abstract](#abstract)
 - [Features](#features)
-- [Installation](#installation)
-  - [From Source](#from-source)
 - [Quick Start](#quick-start)
+  - [Aqua Integration](#aqua-integration)
   - [Docker](#docker)
+  - [Kubernetes](#kubernetes)
 - [Disclaimer](#disclaimer)
 
 # Abstract
@@ -22,33 +22,32 @@
   - Message Types - Success, Detect, Block, Alert
   - Formats the audit message to a Slack message attachment
   - Allows for the filtering of message types
-  
-# Installation
-## From Source
-
-```sh
-mkdir -p $GOPATH/src/github.com/BryanKMorrow
-cd $GOPATH/src/github.com/BryanKMorrow
-git clone https://github.com/BryanKMorrow/aqua-events-go
-cd aqua-events-go/cmd/aqua-events-go
-export GO111MODULE=on
-go install
-```
 
 # Quick Start
-Pull and run the image.
 
-Set the required environment variables.
+## Aqua Integration
+- Navigate to the Log Management Integration page
+  - Administration -> Integrations -> Log Management
+- Select the Webhook integration
+  - Enable the service, paste the URL to your aqua-events container service and test connection
+  - If test is successful, save the integration, and you will start receiving audit events to Slack
+  
+<img src="images/aqua-integration.png" width="300">
+<img src="images/slack-example.png" width="300">
 
-```sh
-export SLACK_WEBHOOK=<https://slackwebhook.url>
-export IGNORE_LIST=success,alert
-
-```
+## Docker
 
 ```sh
 docker pull bkmorrow/aqua-events-go:latest
-docker run --rm --name aqua-events -p 8000:8000 --env SLACK_WEBHOOK=https://slackwebhook.url --env IGNORE_LIST=success,alert bkmorrow/aqua-events-go:latest 
+docker run --rm --name aqua-events -p 8000:8000 --env SLACK_WEBHOOK=https://slackwebhook.url --env IGNORE_LIST=success,detect bkmorrow/aqua-events-go:latest 
+```
+
+## Kubernetes
+Modify the environment variables
+* SLACK_WEBHOOK - This will be the URL to you receive from the Slack App
+* IGNORE_LIST - This is a comma separated list of event categories to ignore (alert,success,detect,block)
+```
+kubectl apply -f kubernetes/aqua-events.yaml
 ```
 
 # License
