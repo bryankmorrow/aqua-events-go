@@ -191,7 +191,7 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 // sliceContains checks for a string in a slice
 func sliceContains(s []string, str string) bool {
 	for _, v := range s {
-		if v == str {
+		if v == strings.TrimSpace(str) {
 			return true
 		}
 	}
