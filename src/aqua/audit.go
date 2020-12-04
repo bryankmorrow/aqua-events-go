@@ -6,6 +6,7 @@ type Audit struct {
 	Adjective         string   `json:"adjective,omitempty"`
 	ApplicationScopes []string `json:"application_scopes,omitempty"`
 	Category          string   `json:"category,omitempty"` // file, os, network, secret, CVE, container, host, kubernetes.enforcer, image, KubernetesAssurancePolicy, Integration
+	Command           string   `json:"command,omitempty"`
 	Container         string   `json:"container,omitempty"`
 	Containerid       string   `json:"containerid,omitempty"`
 	Control           string   `json:"control,omitempty"`

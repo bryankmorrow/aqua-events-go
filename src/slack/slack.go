@@ -78,7 +78,6 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 	m.Attachment.Fallback = Fallback
 	m.Attachment.AuthorName = AuthorName
 	m.Attachment.AuthorSubname = AuthorSubname
-	m.Attachment.AuthorLink = AuthorLink
 	m.Attachment.AuthorIcon = AuthorIcon
 	// format based on message level
 	if audit.Result == 1 {
@@ -114,8 +113,8 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 			m.Attachment.AuthorSubname = fmt.Sprintf("Scan of image %s from registry %s revealed %d total vulnerabilities",
 				audit.Image, audit.Registry, audit.Critical+audit.High+audit.Medium+audit.Low)
 		} else if audit.Category == "container" || audit.Category == "file" || audit.Category == "secret" {
-			text = fmt.Sprintf("Host: %s\nHost IP: %s\nImage Name: %s\nContainer Name: %s\nAction: %s\nKubernetes Cluster: %s\nPod Name: %s\nPod Namespace: %s\nVM Location: %s\nAqua Response: %s\nAqua Policy: %s\nSecurity Control: %s\n"+
-				"Details: %s\nEnforcer Group: %s\nTime Stamp: %s\n", audit.Host, audit.Hostip, audit.Image, audit.Container, audit.Action, audit.K8SCluster, audit.Podname, audit.Podnamespace, audit.VMLocation, "Detect", audit.Rule, audit.Control,
+			text = fmt.Sprintf("Host: %s\nHost IP: %s\nImage Name: %s\nContainer Name: %s\nAction: %s\nKubernetes Cluster: %s\nPod Name: %s\nPod Namespace: %s\nVM Location: %s\nAqua Response: %s\nAqua Policy: %s\nResource: %s\nCommand: %s\nSecurity Control: %s\n"+
+				"Details: %s\nEnforcer Group: %s\nTime Stamp: %s\n", audit.Host, audit.Hostip, audit.Image, audit.Container, audit.Action, audit.K8SCluster, audit.Podname, audit.Podnamespace, audit.VMLocation, "Detect", audit.Rule, audit.Resource, audit.Command, audit.Control,
 				audit.Reason, audit.Hostgroup, time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
 			m.Attachment.AuthorSubname = fmt.Sprintf("User ran command %s on host %s", audit.Action, audit.Host)
 		} else {
@@ -128,8 +127,8 @@ func (m *Message) Format(audit aqua.Audit) slack.WebhookMessage {
 	} else if audit.Result == 2 {
 		m.Attachment.Color = "danger"
 		if audit.Category == "container" || audit.Category == "file" || audit.Category == "secret" {
-			text = fmt.Sprintf("Host: %s\nHost IP: %s\nImage Name: %s\nContainer Name: %s\nAction: %s\nKubernetes Cluster: %s\nPod Name: %s\nPod Namespace: %s\nVM Location: %s\nAqua Response: %s\nAqua Policy: %s\nSecurity Control: %s\n"+
-				"Details: %s\nEnforcer Group: %s\nTime Stamp: %s\n", audit.Host, audit.Hostip, audit.Image, audit.Container, audit.Action, audit.K8SCluster, audit.Podname, audit.Podnamespace, audit.VMLocation, "Detect", audit.Rule, audit.Control,
+			text = fmt.Sprintf("Host: %s\nHost IP: %s\nImage Name: %s\nContainer Name: %s\nAction: %s\nKubernetes Cluster: %s\nPod Name: %s\nPod Namespace: %s\nVM Location: %s\nAqua Response: %s\nAqua Policy: %s\nResource: %s\nCommand: %s\nSecurity Control: %s\n"+
+				"Details: %s\nEnforcer Group: %s\nTime Stamp: %s\n", audit.Host, audit.Hostip, audit.Image, audit.Container, audit.Action, audit.K8SCluster, audit.Podname, audit.Podnamespace, audit.VMLocation, "Detect", audit.Rule, audit.Resource, audit.Command, audit.Control,
 				audit.Reason, audit.Hostgroup, time.Unix(int64(audit.Time), 0).Format(time.RFC822Z))
 			m.Attachment.AuthorSubname = fmt.Sprintf("User ran command %s on host %s", audit.Action, audit.Host)
 		} else {
